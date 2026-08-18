@@ -2,44 +2,87 @@
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
+#include <SDL2/SDL_image.h>
 #include <cmath>
 #include<iostream>
 #include <string>
+#include <bits/stdc++.h>
 using namespace std;
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 
-const int MAP_WIDTH = 16;
-const int MAP_HEIGHT = 16;
-const int map[MAP_HEIGHT][MAP_WIDTH] = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 2, 2, 0, 2, 2, 2, 1}, 
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 2, 0, 1},
-    {1, 1, 0, 1, 1, 1, 1, 0, 0, 2, 2, 0, 2, 2, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 3, 3, 3, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 3, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 3, 0, 0, 0, 0, 0, 3, 0, 4, 4, 4, 4, 4, 1},
-    {1, 0, 3, 0, 5, 5, 5, 0, 3, 0, 4, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 5, 0, 5, 0, 0, 0, 4, 0, 0, 0, 0, 1},
-    {1, 0, 3, 0, 5, 0, 5, 0, 3, 0, 4, 0, 0, 0, 0, 1},
-    {1, 0, 3, 3, 3, 0, 3, 3, 3, 0, 4, 4, 4, 4, 4, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+#define TEXTURE_WIDTH 64
+#define TEXTURE_HEIGHT 64
+
+#define MAP_HEIGHT 24
+#define MAP_WIDTH 24
+const int world_map[MAP_HEIGHT][MAP_WIDTH] = {
+  {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,7,7,7,7,7,7,7,7},
+  {4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
+  {4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
+  {4,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
+  {4,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
+  {4,0,4,0,0,0,0,5,5,5,5,5,5,5,5,5,7,7,0,7,7,7,7,7},
+  {4,0,5,0,0,0,0,5,0,5,0,5,0,5,0,5,7,0,0,0,7,7,7,1},
+  {4,0,6,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
+  {4,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,1},
+  {4,0,8,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
+  {4,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,7,7,7,1},
+  {4,0,0,0,0,0,0,5,5,5,5,0,5,5,5,5,7,7,7,7,7,7,7,1},
+  {6,6,6,6,6,6,6,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
+  {8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+  {6,6,6,6,6,6,0,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
+  {4,4,4,4,4,4,0,4,4,4,6,0,6,2,2,2,2,2,2,2,3,3,3,3},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,0,0,0,6,2,0,0,5,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+  {4,0,6,0,6,0,0,0,0,4,6,0,0,0,0,0,5,0,0,0,0,0,0,2},
+  {4,0,0,5,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
+  {4,0,6,0,6,0,0,0,0,4,6,0,6,2,0,0,5,0,0,2,0,0,0,2},
+  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
+  {4,4,4,4,4,4,4,4,4,4,1,1,1,2,2,2,2,2,2,3,3,3,3,3}
 };
 
+void load_texture(int id, vector<Uint32> texture[8], const char* filepath){
+		SDL_Surface* surface = IMG_Load(filepath);
+		if (!surface){
+			cout << "Failed to load textures!" << filepath << endl;
+			return;
+		}
+
+		SDL_Surface* formatted = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_ARGB8888, 0);
+		SDL_FreeSurface(surface);
+
+		Uint32* pixels = (Uint32*)formatted -> pixels;
+		for (int i = 0; i < (TEXTURE_WIDTH * TEXTURE_HEIGHT); i++){
+			texture[id][i] = pixels[i];
+		}
+
+		SDL_FreeSurface(formatted);
+	}
+
+
+
 int main(int argc, char* args[]){
-	double posX = 2.5, posY = 2.5;
+	double posX = 1.5, posY = 1.5;
 	double dirX = 0.0, dirY = 1.0;
 	double planeX = 0.66, planeY = 0.0;
 	double time = 0.0, old_time = 0.0;
+
+	Uint32 buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
+	vector<Uint32> texture[8];
+	
+
+	for (int i = 0; i < 8; i++){
+		texture[i].resize(TEXTURE_WIDTH * TEXTURE_HEIGHT);
+	}
+	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0){
 		cout << "SDL could not be initialized. Error: " << SDL_GetError() << endl;
 	}
@@ -53,6 +96,19 @@ int main(int argc, char* args[]){
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	bool is_running = true;
 	SDL_Event event;
+	
+
+	//handling the textures
+	load_texture(0, texture, "wall_textures/eagle.png");
+	load_texture(1, texture, "wall_textures/redbrick.png");
+	load_texture(2, texture, "wall_textures/purplestone.png");
+	load_texture(3, texture, "wall_textures/greystone.png");
+	load_texture(4, texture, "wall_textures/bluestone.png");
+	load_texture(5, texture, "wall_textures/mossy.png");
+	load_texture(6, texture, "wall_textures/wood.png");
+	load_texture(7, texture, "wall_textures/colorstone.png");
+	
+	SDL_Texture* screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	// starting off with the entire loop
 	
@@ -78,13 +134,13 @@ int main(int argc, char* args[]){
         const Uint8* state = SDL_GetKeyboardState(NULL);
 
 		if (state[SDL_SCANCODE_UP] || state[SDL_SCANCODE_W]){
-			if (map[int(posX + dirX * move_speed)][int(posY)] == 0) posX += dirX * move_speed;
-			if (map[int(posX)][int(posY + dirY * move_speed)] == 0) posY += dirY * move_speed;
+			if (world_map[int(posX + dirX * move_speed)][int(posY)] == 0) posX += dirX * move_speed;
+			if (world_map[int(posX)][int(posY + dirY * move_speed)] == 0) posY += dirY * move_speed;
 		}
 		
 		if (state[SDL_SCANCODE_DOWN] || state[SDL_SCANCODE_S]){
-				if (map[int(posX - dirX * move_speed)][int(posY)] == 0) posX -= dirX * move_speed;
-				if (map[int(posX)][int(posY - dirY * move_speed)] == 0) posY -= dirY * move_speed;
+				if (world_map[int(posX - dirX * move_speed)][int(posY)] == 0) posX -= dirX * move_speed;
+				if (world_map[int(posX)][int(posY - dirY * move_speed)] == 0) posY -= dirY * move_speed;
 				}
 		
 		if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_A]){
@@ -161,7 +217,7 @@ int main(int argc, char* args[]){
 					wall_hit = 1;
 					break;
 				}
-				if (map[mapX][mapY] > 0) wall_hit = 1;	
+				if (world_map[mapX][mapY] > 0) wall_hit = 1;	
 			}
 			// long ass calculation gets simplified to this
 			if (side == 0) perpWallDist = (sidedistX - deltadistX);
@@ -179,40 +235,53 @@ int main(int argc, char* args[]){
 			mapX = (mapX >= MAP_WIDTH) ? MAP_WIDTH - 1 : mapX;
 			mapY = (mapY < 0) ? 0 : mapY;
 			mapY = (mapY >= MAP_HEIGHT) ? MAP_HEIGHT - 1 : mapY;
-			// coloring stuff!
+			// texturing stuff!
 			int r, g, b;
-			switch (map[mapX][mapY]){
-				case 1: r = 255, g = 0, b = 0;
-						break;
-				case 2: r = 0, g = 255, b = 0;
-						break;
-				case 3: r = 0, g = 0, b = 255;
-						break;
-				case 4: r = 255, g = 255, b = 0;
-						break;
-				case 5: r = 255, g = 0, b = 255;
-						break;
-				case 6: r = 0, g = 255, b = 255;
-						break;
-				default: r = 255, g = 255, b = 0;
-						 break;
+			double wallX;
+			int texture_num = world_map[mapX][mapY] - 1;
+			if (side == 0) wallX = posY + perpWallDist * raydirY;
+			else wallX = posX + perpWallDist * raydirX;
+			wallX -= floor(wallX);
+
+			int textureX = int(wallX * double(TEXTURE_WIDTH));
+			if (side == 0 && raydirX > 0) textureX = TEXTURE_WIDTH - textureX - 1;
+			if (side == 1 && raydirY < 0) textureX = TEXTURE_WIDTH - textureX - 1;
+			
+			double step = 1.0 * TEXTURE_HEIGHT / line_height;
+			double texture_pos = (draw_start - SCREEN_HEIGHT / 2.0 + line_height / 2.0) * step;
+			for (int y = 0; y < draw_start; y++){
+				buffer[y][x] = 0xFF333333;
 			}
-			if (side == 1){
-				r /= 2;
-				g /= 2;
-				b /= 2;
+
+			for (int y = draw_start; y < draw_end; y++){
+				int textureY = (int)texture_pos & (TEXTURE_HEIGHT - 1);
+				texture_pos += step;
+				Uint32 color = texture[texture_num][TEXTURE_HEIGHT * textureY + textureX];
+
+				if (side == 1) color = (color >> 1) & 8355711;
+				buffer[y][x] = color;
+			}
+
+			for (int y = draw_end; y < SCREEN_HEIGHT; y++){
+				buffer[y][x] = 0xFF555555;
 		}
-			SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-			SDL_RenderDrawLine(renderer, x, draw_start, x, draw_end);
+
+
+
 		}
+
+		SDL_UpdateTexture(screen_texture, NULL, buffer, SCREEN_WIDTH * sizeof(Uint32));
+		SDL_RenderClear(renderer);
+		SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
 		SDL_RenderPresent(renderer);
 		SDL_Delay(16);
 		
 
 		
 	}
+	SDL_DestroyTexture(screen_texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	return 0;
-		}	
+}	
