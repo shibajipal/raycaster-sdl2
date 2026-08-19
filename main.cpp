@@ -142,8 +142,15 @@ int main(int argc, char* args[]){
 				if (world_map[int(posX - dirX * move_speed)][int(posY)] == 0) posX -= dirX * move_speed;
 				if (world_map[int(posX)][int(posY - dirY * move_speed)] == 0) posY -= dirY * move_speed;
 				}
-		
 		if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_A]){
+			if (state[SDL_SCANCODE_LSHIFT]){
+			// cout << "strafe left" << endl;
+			if (world_map[int(posX - dirY * move_speed)][int(posY)] == 0) posX -= dirY * move_speed;
+			if (world_map[int(posX)][int(posY + dirY * move_speed)] == 0) posY += dirX * move_speed;
+			}
+			
+			else{
+			// cout << "normal left" << endl;
 			double old_dirX = dirX;
 			dirX = dirX * cos(rot_speed) - dirY * sin(rot_speed);
 			dirY = old_dirX * sin(rot_speed) + dirY * cos(rot_speed);
@@ -151,17 +158,29 @@ int main(int argc, char* args[]){
 			double old_planeX = planeX;
 			planeX = planeX * cos(rot_speed) - planeY * sin(rot_speed);
 			planeY = old_planeX * sin(rot_speed) + planeY * cos(rot_speed);
-		}
+		}}
 
 		if (state[SDL_SCANCODE_RIGHT] || state[SDL_SCANCODE_D]){
+			if ((state[SDL_SCANCODE_LSHIFT])){
+				// cout << "strafe right" << endl;
+				if (world_map[int(posX + dirY * move_speed)][int(posY)] == 0) posX += dirY * move_speed;
+				if (world_map[int(posX)][int(posY - dirY * move_speed)] == 0) posY -= dirX * move_speed;
+		}
+			else{
+		// cout << "normal right" << endl;
 			double old_dirX = dirX;
 			dirX = dirX * cos(-rot_speed) - dirY * sin(-rot_speed);
 			dirY = old_dirX * sin(-rot_speed) + dirY * cos(-rot_speed);
 
 			double old_planeX = planeX;
 			planeX = planeX * cos(-rot_speed) - planeY * sin(-rot_speed);
-			planeY = old_planeX * sin(-rot_speed) + planeY * cos(-rot_speed);
+			planeY = old_planeX * sin(-rot_speed) + planeY * cos(-rot_speed);	
+			}
 		}
+
+		
+
+		
 
 		SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
 		SDL_RenderClear(renderer);
