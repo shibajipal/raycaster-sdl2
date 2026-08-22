@@ -22,31 +22,32 @@ using namespace std;
 
 #define MAP_HEIGHT 24
 #define MAP_WIDTH 24
-const int world_map[MAP_HEIGHT][MAP_WIDTH] = {
-  {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,7,7,7,7,7,7,7,7},
-  {4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
-  {4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
-  {4,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7},
-  {4,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,7},
-  {4,0,4,0,0,0,0,5,5,5,5,5,5,5,5,5,7,7,0,7,7,7,7,7},
-  {4,0,5,0,0,0,0,5,0,5,0,5,0,5,0,5,7,0,0,0,7,7,7,1},
-  {4,0,6,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
-  {4,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,1},
-  {4,0,8,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,0,0,0,8},
-  {4,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,7,0,0,0,7,7,7,1},
-  {4,0,0,0,0,0,0,5,5,5,5,0,5,5,5,5,7,7,7,7,7,7,7,1},
-  {6,6,6,6,6,6,6,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
-  {8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-  {6,6,6,6,6,6,0,6,6,6,6,0,6,6,6,6,6,6,6,6,6,6,6,6},
-  {4,4,4,4,4,4,0,4,4,4,6,0,6,2,2,2,2,2,2,2,3,3,3,3},
-  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
-  {4,0,0,0,0,0,0,0,0,0,0,0,6,2,0,0,5,0,0,2,0,0,0,2},
-  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
-  {4,0,6,0,6,0,0,0,0,4,6,0,0,0,0,0,5,0,0,0,0,0,0,2},
-  {4,0,0,5,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,2,0,2,2},
-  {4,0,6,0,6,0,0,0,0,4,6,0,6,2,0,0,5,0,0,2,0,0,0,2},
-  {4,0,0,0,0,0,0,0,0,4,6,0,6,2,0,0,0,0,0,2,0,0,0,2},
-  {4,4,4,4,4,4,4,4,4,4,1,1,1,2,2,2,2,2,2,3,3,3,3,3}
+
+int world_map[MAP_WIDTH][MAP_HEIGHT] = {
+	{8,8,8,8,8,8,8,8,8,8,8,4,4,6,4,4,6,4,6,4,4,4,6,4},
+  {8,0,0,0,0,0,0,0,0,0,8,4,0,0,0,0,0,0,0,0,0,0,0,4},
+  {8,0,3,3,0,0,0,0,0,8,8,4,0,0,0,0,0,0,0,0,0,0,0,6},
+  {8,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6},
+  {8,0,3,3,0,0,0,0,0,8,8,4,0,0,0,0,0,0,0,0,0,0,0,4},
+  {8,0,0,0,0,0,0,0,0,0,8,4,0,0,0,0,0,6,6,6,0,6,4,6},
+  {8,8,8,8,0,8,8,8,8,8,8,4,4,4,4,4,4,6,0,0,0,0,0,6},
+  {7,7,7,7,0,7,7,7,7,0,8,0,8,0,8,0,8,4,0,4,0,6,0,6},
+  {7,7,0,0,0,0,0,0,7,8,0,8,0,8,0,8,8,6,0,0,0,0,0,6},
+  {7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,6,0,0,0,0,0,4},
+  {7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,6,0,6,0,6,0,6},
+  {7,7,0,0,0,0,0,0,7,8,0,8,0,8,0,8,8,6,4,6,0,6,6,6},
+  {7,7,7,7,0,7,7,7,7,8,8,4,0,6,8,4,8,3,3,3,0,3,3,3},
+  {2,2,2,2,0,2,2,2,2,4,6,4,0,0,6,0,6,3,0,0,0,0,0,3},
+  {2,2,0,0,0,0,0,2,2,4,0,0,0,0,0,0,4,3,0,0,0,0,0,3},
+  {2,0,0,0,0,0,0,0,2,4,0,0,0,0,0,0,4,3,0,0,0,0,0,3},
+  {1,0,0,0,0,0,0,0,1,4,4,4,4,4,6,0,6,3,3,0,0,0,3,3},
+  {2,0,0,0,0,0,0,0,2,2,2,1,2,2,2,6,6,0,0,5,0,5,0,5},
+  {2,2,0,0,0,0,0,2,2,2,0,0,0,2,2,0,5,0,5,0,0,0,5,5},
+  {2,0,0,0,0,0,0,0,2,0,0,0,0,0,2,5,0,5,0,5,0,5,0,5},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
+  {2,0,0,0,0,0,0,0,2,0,0,0,0,0,2,5,0,5,0,5,0,5,0,5},
+  {2,2,0,0,0,0,0,2,2,2,0,0,0,2,2,0,5,0,5,0,0,0,5,5},
+  {2,2,2,2,1,2,2,2,2,2,2,1,2,2,2,5,5,5,5,5,5,5,5,5}
 };
 
 void load_texture(int id, vector<Uint32> texture[8], const char* filepath){
@@ -76,10 +77,10 @@ int main(int argc, char* args[]){
 	double time = 0.0, old_time = 0.0;
 
 	Uint32 buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
-	vector<Uint32> texture[8];
+	vector<Uint32> texture[9];
 	
 
-	for (int i = 0; i < 8; i++){
+	for (int i = 0; i < 9; i++){
 		texture[i].resize(TEXTURE_WIDTH * TEXTURE_HEIGHT);
 	}
 	
@@ -107,6 +108,7 @@ int main(int argc, char* args[]){
 	load_texture(5, texture, "wall_textures/mossy.png");
 	load_texture(6, texture, "wall_textures/wood.png");
 	load_texture(7, texture, "wall_textures/colorstone.png");
+	load_texture(8, texture, "wall_textures/redbrick.png");
 	
 	SDL_Texture* screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -184,6 +186,49 @@ int main(int argc, char* args[]){
 
 		SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
 		SDL_RenderClear(renderer);
+
+		
+		for (int y = 0; y < SCREEN_HEIGHT; y++){
+			float ray_dir_leftX = dirX - planeX;
+			float ray_dir_leftY = dirY - planeY;
+
+			float ray_dir_rightX = dirX + planeX;
+			float ray_dir_rightY = dirY + planeY;
+
+			int y_current = y - SCREEN_HEIGHT / 2;
+			float posZ = 0.5 * SCREEN_HEIGHT;
+			
+			float row_distance = posZ / y_current;
+			float floor_stepX = row_distance * (ray_dir_rightX - ray_dir_leftX) / SCREEN_WIDTH;
+			float floor_stepY = row_distance * (ray_dir_rightY - ray_dir_leftY) / SCREEN_WIDTH;
+
+			float floorX = posX + row_distance * ray_dir_leftX;
+			float floorY = posY + row_distance * ray_dir_leftY;
+
+			for (int x = 0; x < SCREEN_WIDTH; ++x){
+				int cellX = (int)(floorX);
+				int cellY = (int)(floorY);
+
+				int tx = (int)(TEXTURE_WIDTH * (floorX - cellX)) & (TEXTURE_WIDTH - 1);
+				int ty = (int)(TEXTURE_HEIGHT * (floorY - cellY)) & (TEXTURE_HEIGHT - 1);
+
+				floorX += floor_stepX;
+				floorY += floor_stepY;
+
+				int floor_texture = 8;
+				int ceiling_texture = 6;
+
+				Uint32 color;
+
+				color = texture[floor_texture][TEXTURE_WIDTH * ty + tx];
+				color = (color >> 1) & 8355711;
+				buffer[y][x] = color;
+
+				color = texture[ceiling_texture][TEXTURE_WIDTH * ty + tx];
+				color = (color >> 1) & 8355711;
+				buffer[SCREEN_HEIGHT - y - 1][x] = color;
+			}
+		}	
 
 
 		for (int x = 0; x < SCREEN_WIDTH; x++){
@@ -268,9 +313,6 @@ int main(int argc, char* args[]){
 			
 			double step = 1.0 * TEXTURE_HEIGHT / line_height;
 			double texture_pos = (draw_start - SCREEN_HEIGHT / 2.0 + line_height / 2.0) * step;
-			for (int y = 0; y < draw_start; y++){
-				buffer[y][x] = 0xFF333333;
-			}
 
 			for (int y = draw_start; y < draw_end; y++){
 				int textureY = (int)texture_pos & (TEXTURE_HEIGHT - 1);
@@ -281,9 +323,6 @@ int main(int argc, char* args[]){
 				buffer[y][x] = color;
 			}
 
-			for (int y = draw_end; y < SCREEN_HEIGHT; y++){
-				buffer[y][x] = 0xFF555555;
-		}
 
 
 
