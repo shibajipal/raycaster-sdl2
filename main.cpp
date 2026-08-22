@@ -2,6 +2,7 @@
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_scancode.h>
@@ -96,6 +97,7 @@ int main(int argc, char* args[]){
 	
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	bool is_running = true;
+	bool is_floorcasting = true;
 	SDL_Event event;
 	
 
@@ -129,7 +131,16 @@ int main(int argc, char* args[]){
 		while (SDL_PollEvent(&event) != 0){
 			if (event.type == SDL_QUIT){
 				is_running = false;
-			}}
+			}
+			else if (event.type == SDL_KEYDOWN && event.key.repeat == 0){
+			if (event.key.keysym.scancode == SDL_SCANCODE_C){
+				if (event.key.keysym.mod & KMOD_ALT){
+					is_floorcasting = !is_floorcasting;
+					cout << "change cast" << endl;
+				}
+			}
+		}
+		}
 
 
 		// handling movements, using WASD or corresponding arrow keys
@@ -180,14 +191,15 @@ int main(int argc, char* args[]){
 			}
 		}
 
-		
 
 		
 
 		SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
 		SDL_RenderClear(renderer);
-
 		
+		cout << "floorcasting " << is_floorcasting << endl;
+		if (is_floorcasting){
+			cout << "we casting" << endl;
 		for (int y = 0; y < SCREEN_HEIGHT; y++){
 			float ray_dir_leftX = dirX - planeX;
 			float ray_dir_leftY = dirY - planeY;
@@ -229,6 +241,7 @@ int main(int argc, char* args[]){
 				buffer[SCREEN_HEIGHT - y - 1][x] = color;
 			}
 		}	
+		}
 
 
 		for (int x = 0; x < SCREEN_WIDTH; x++){
@@ -313,6 +326,12 @@ int main(int argc, char* args[]){
 			
 			double step = 1.0 * TEXTURE_HEIGHT / line_height;
 			double texture_pos = (draw_start - SCREEN_HEIGHT / 2.0 + line_height / 2.0) * step;
+			
+			if (!is_floorcasting){
+			for (int y = 0; y < draw_start; y++){
+				buffer[y][x] = 0xFF333333;
+			}
+			}
 
 			for (int y = draw_start; y < draw_end; y++){
 				int textureY = (int)texture_pos & (TEXTURE_HEIGHT - 1);
@@ -322,7 +341,12 @@ int main(int argc, char* args[]){
 				if (side == 1) color = (color >> 1) & 8355711;
 				buffer[y][x] = color;
 			}
-
+			
+			if (!is_floorcasting){
+			for (int y = draw_end; y < SCREEN_HEIGHT; y++){
+				buffer[y][x] = 0xFF555555;
+			}
+			}
 
 
 
