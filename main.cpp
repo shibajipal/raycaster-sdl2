@@ -51,7 +51,7 @@ int world_map[MAP_WIDTH][MAP_HEIGHT] = {
   {2,2,2,2,1,2,2,2,2,2,2,1,2,2,2,5,5,5,5,5,5,5,5,5}
 };
 
-void load_texture(int id, vector<Uint32> texture[8], const char* filepath){
+void load_texture(int id, vector<Uint32> texture[12], const char* filepath){
 		SDL_Surface* surface = IMG_Load(filepath);
 		if (!surface){
 			cout << "Failed to load textures!" << filepath << endl;
@@ -69,6 +69,60 @@ void load_texture(int id, vector<Uint32> texture[8], const char* filepath){
 		SDL_FreeSurface(formatted);
 	}
 
+struct Sprite{
+	double x;
+	double y;
+	int texture;
+};
+
+#define SPRITE_COUNT 19
+
+Sprite sprite[SPRITE_COUNT] = {
+	{20.5, 11.5, 10}, //green light in front of playerstart
+  //green lights in every room
+  {18.5,4.5, 10},
+  {10.0,4.5, 10},
+  {10.0,12.5,10},
+  {3.5, 6.5, 10},
+  {3.5, 20.5,10},
+  {3.5, 14.5,10},
+  {14.5,20.5,10},
+
+  //row of pillars in front of wall: fisheye test
+  {18.5, 10.5, 9},
+  {18.5, 11.5, 9},
+  {18.5, 12.5, 9},
+
+  //some barrels around the map
+  {21.5, 1.5, 8},
+  {15.5, 1.5, 8},
+  {16.0, 1.8, 8},
+  {16.2, 1.2, 8},
+  {3.5,  2.5, 8},
+  {9.5, 15.5, 8},
+  {10.0, 15.1,8},
+  {10.5, 15.8,8},
+};
+
+
+double Zbuffer[SCREEN_WIDTH];
+int sprite_order[SPRITE_COUNT];
+
+double sprite_distances[SPRITE_COUNT];
+
+void sort_sprites(int* order, double* dist, int amount){
+	vector<pair<double, int>> sprites(amount);
+	for (int i = 0; i < amount; i++){
+		sprites[i].first = dist[i];
+		sprites[i].second = order[i];
+	}
+
+	sort(sprites.begin(), sprites.end());
+	for (int i = 0; i < amount; i++){
+		dist[i] = sprites[amount - i - 1].first;
+		order[i] = sprites[amount - i - 1].second;
+	}
+}
 
 
 int main(int argc, char* args[]){
@@ -78,10 +132,10 @@ int main(int argc, char* args[]){
 	double time = 0.0, old_time = 0.0;
 
 	Uint32 buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
-	vector<Uint32> texture[9];
+	vector<Uint32> texture[12];
 	
 
-	for (int i = 0; i < 9; i++){
+	for (int i = 0; i < 12; i++){
 		texture[i].resize(TEXTURE_WIDTH * TEXTURE_HEIGHT);
 	}
 	
@@ -110,7 +164,10 @@ int main(int argc, char* args[]){
 	load_texture(5, texture, "wall_textures/mossy.png");
 	load_texture(6, texture, "wall_textures/wood.png");
 	load_texture(7, texture, "wall_textures/colorstone.png");
-	load_texture(8, texture, "wall_textures/redbrick.png");
+	load_texture(8, texture, "wall_textures/barrel.png");
+	load_texture(9, texture, "wall_textures/pillar.png");
+	load_texture(10, texture, "wall_textures/greenlight.png");
+	load_texture(11, texture, "wall_textures/redbrick.png");
 	
 	SDL_Texture* screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -197,9 +254,9 @@ int main(int argc, char* args[]){
 		SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
 		SDL_RenderClear(renderer);
 		
-		cout << "floorcasting " << is_floorcasting << endl;
+		// cout << "floorcasting " << is_floorcasting << endl;
 		if (is_floorcasting){
-			cout << "we casting" << endl;
+		// 	cout << "we casting" << endl;
 		for (int y = 0; y < SCREEN_HEIGHT; y++){
 			float ray_dir_leftX = dirX - planeX;
 			float ray_dir_leftY = dirY - planeY;
@@ -227,7 +284,7 @@ int main(int argc, char* args[]){
 				floorX += floor_stepX;
 				floorY += floor_stepY;
 
-				int floor_texture = 8;
+				int floor_texture = 4;
 				int ceiling_texture = 6;
 
 				Uint32 color;
@@ -347,10 +404,56 @@ int main(int argc, char* args[]){
 				buffer[y][x] = 0xFF555555;
 			}
 			}
-
-
+			Zbuffer[x] = perpWallDist;
+		}
+		// sprite casting
+		for (int i = 0; i < SPRITE_COUNT; i++){
+			sprite_order[i] = i;
+			sprite_distances[i] = ((posX - sprite[i].x) * (posX -sprite[i].x) + (posY - sprite[i].y) * (posY - sprite[i].y));
 
 		}
+		sort_sprites(sprite_order, sprite_distances, SPRITE_COUNT);
+
+		for (int i = 0; i < SPRITE_COUNT; i++){
+			double spriteX = sprite[sprite_order[i]].x - posX;
+			double spriteY = sprite[sprite_order[i]].y - posY;
+
+			
+			double inverse_det = 1.0 / (planeX * dirY - planeY * dirX);
+			double transformX = inverse_det * (dirY * spriteX - dirX * spriteY);
+			double transformY = inverse_det * (planeX * spriteY - planeY * spriteX);
+
+			int sprite_screenX = int((SCREEN_WIDTH / 2) * (1 + transformX / transformY));
+			int sprite_height = abs(int(SCREEN_HEIGHT / transformY));
+
+			int draw_startY = -sprite_height / 2 + SCREEN_HEIGHT / 2;
+			draw_startY = (draw_startY < 0) ? 0 : draw_startY;
+
+			int draw_endY = sprite_height / 2 + SCREEN_HEIGHT / 2;
+			draw_endY = (draw_endY >= SCREEN_HEIGHT) ? (SCREEN_HEIGHT - 1) : draw_endY;
+
+			int sprite_width = abs(int(SCREEN_HEIGHT / transformY));
+			int draw_startX = -sprite_width / 2 + sprite_screenX;
+			draw_startX = (draw_startX < 0) ? 0 : draw_startX;
+
+			int draw_endX = sprite_width / 2 + sprite_screenX;
+			draw_endX = (draw_endX >= SCREEN_WIDTH) ? (SCREEN_WIDTH - 1) : draw_endX;
+
+			for (int stripe = draw_startX; stripe < draw_endX; stripe++){
+				int textureX = int(256 * (stripe - (-sprite_width / 2 + sprite_screenX)) * TEXTURE_WIDTH / sprite_width) / 256;
+				if (transformY > 0 && stripe > 0 && stripe < SCREEN_WIDTH && transformY < Zbuffer[stripe]){
+					for (int y = draw_startY; y < draw_endY; y++){
+						int d = (y) * 256 - SCREEN_HEIGHT * 128 + sprite_height * 128;
+						int textureY = ((d * TEXTURE_HEIGHT) / sprite_height) / 256;
+						Uint32 color = texture[sprite[sprite_order[i]].texture][TEXTURE_WIDTH * textureY + textureX];
+						if ((color & 0x00FFFFFF) != 0) buffer[y][stripe] = color;
+					}
+				}
+			}
+
+			
+		}
+		
 
 		SDL_UpdateTexture(screen_texture, NULL, buffer, SCREEN_WIDTH * sizeof(Uint32));
 		SDL_RenderClear(renderer);
