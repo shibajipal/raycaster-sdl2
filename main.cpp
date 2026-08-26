@@ -25,30 +25,30 @@ using namespace std;
 #define MAP_WIDTH 24
 
 int world_map[MAP_WIDTH][MAP_HEIGHT] = {
-	{8,8,8,8,8,8,8,8,8,8,8,4,4,6,4,4,6,4,6,4,4,4,6,4},
-  {8,0,0,0,0,0,0,0,0,0,8,4,0,0,0,0,0,0,0,0,0,0,0,4},
-  {8,0,3,3,0,0,0,0,0,8,8,4,0,0,0,0,0,0,0,0,0,0,0,6},
-  {8,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6},
-  {8,0,3,3,0,0,0,0,0,8,8,4,0,0,0,0,0,0,0,0,0,0,0,4},
-  {8,0,0,0,0,0,0,0,0,0,8,4,0,0,0,0,0,6,6,6,0,6,4,6},
-  {8,8,8,8,0,8,8,8,8,8,8,4,4,4,4,4,4,6,0,0,0,0,0,6},
-  {7,7,7,7,0,7,7,7,7,0,8,0,8,0,8,0,8,4,0,4,0,6,0,6},
-  {7,7,0,0,0,0,0,0,7,8,0,8,0,8,0,8,8,6,0,0,0,0,0,6},
-  {7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,6,0,0,0,0,0,4},
-  {7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,6,0,6,0,6,0,6},
-  {7,7,0,0,0,0,0,0,7,8,0,8,0,8,0,8,8,6,4,6,0,6,6,6},
-  {7,7,7,7,0,7,7,7,7,8,8,4,0,6,8,4,8,3,3,3,0,3,3,3},
-  {2,2,2,2,0,2,2,2,2,4,6,4,0,0,6,0,6,3,0,0,0,0,0,3},
-  {2,2,0,0,0,0,0,2,2,4,0,0,0,0,0,0,4,3,0,0,0,0,0,3},
-  {2,0,0,0,0,0,0,0,2,4,0,0,0,0,0,0,4,3,0,0,0,0,0,3},
-  {1,0,0,0,0,0,0,0,1,4,4,4,4,4,6,0,6,3,3,0,0,0,3,3},
-  {2,0,0,0,0,0,0,0,2,2,2,1,2,2,2,6,6,0,0,5,0,5,0,5},
-  {2,2,0,0,0,0,0,2,2,2,0,0,0,2,2,0,5,0,5,0,0,0,5,5},
-  {2,0,0,0,0,0,0,0,2,0,0,0,0,0,2,5,0,5,0,5,0,5,0,5},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5},
-  {2,0,0,0,0,0,0,0,2,0,0,0,0,0,2,5,0,5,0,5,0,5,0,5},
-  {2,2,0,0,0,0,0,2,2,2,0,0,0,2,2,0,5,0,5,0,0,0,5,5},
-  {2,2,2,2,1,2,2,2,2,2,2,1,2,2,2,5,5,5,5,5,5,5,5,5}
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,8,8,0,0,0,0,2,2,0,0,2,2,0,0,0,0,5,5,0,0,1},
+  {1,0,0,8,8,0,0,0,0,2,2,0,0,2,2,0,0,0,0,5,5,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,1},
+  {1,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,1},
+  {1,0,0,2,2,0,0,0,0,0,0,3,3,0,0,0,0,0,0,6,6,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,1},
+  {1,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,1},
+  {1,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,6,6,0,0,0,0,2,2,0,0,2,2,0,0,0,0,8,8,0,0,1},
+  {1,0,0,6,6,0,0,0,0,2,2,0,0,2,2,0,0,0,0,8,8,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
 void load_texture(int id, vector<Uint32> texture[12], const char* filepath){
@@ -69,42 +69,62 @@ void load_texture(int id, vector<Uint32> texture[12], const char* filepath){
 		SDL_FreeSurface(formatted);
 	}
 
+Uint32 apply_fog_depth(Uint32 color, double distance, bool is_side_wall = false){
+
+	if ((color & 0x00FFFFFF) == 0) return color;
+	double max_distance = 22.0;
+	double fog_intensity = 1.0 - (distance / max_distance);
+
+	fog_intensity = max(0.0, fog_intensity);
+	fog_intensity = min(1.0, fog_intensity);
+
+
+	
+
+	// const double fog_r = 30.0, fog_g = 15.0, fog_b = 8.0;
+	const double fog_r = 5.0, fog_g = 25.0, fog_b = 10.0;
+	
+	Uint8 a = (color >> 24) & 0xFF;
+	Uint8 r = ((color >> 16) & 0xFF);
+	Uint8 g = ((color >> 8) & 0xFF);
+	Uint8 b = (color & 0xFF);
+
+	if (is_side_wall){
+		r /= 2;
+		g /= 2;
+		b /= 2;
+	}
+	r = (Uint8)(r * fog_intensity + fog_r * (1.0 - fog_intensity));
+	g = (Uint8)(g * fog_intensity + fog_g * (1.0 - fog_intensity));
+	b = (Uint8)(b * fog_intensity + fog_b * (1.0 - fog_intensity));
+
+	return (0xFFu << 24) | (r << 16) | (g << 8) | b;
+
+}
+
 struct Sprite{
 	double x;
 	double y;
 	int texture;
 };
 
-#define SPRITE_COUNT 19
+#define SPRITE_COUNT 30
 
 Sprite sprite[SPRITE_COUNT] = {
-	{20.5, 11.5, 10}, //green light in front of playerstart
-  //green lights in every room
-  {18.5,4.5, 10},
-  {10.0,4.5, 10},
-  {10.0,12.5,10},
-  {3.5, 6.5, 10},
-  {3.5, 20.5,10},
-  {3.5, 14.5,10},
-  {14.5,20.5,10},
+    // a glowing perimeter and inner quad of green lights (10)
+    {2.5, 2.5, 10}, {2.5, 21.5, 10}, {21.5, 2.5, 10}, {21.5, 21.5, 10},
+    {11.5, 2.5, 10}, {11.5, 21.5, 10}, {2.5, 11.5, 10}, {21.5, 11.5, 10},
+    {7.5, 7.5, 10}, {16.5, 16.5, 10}, {7.5, 16.5, 10}, {16.5, 7.5, 10},
 
-  //row of pillars in front of wall: fisheye test
-  {18.5, 10.5, 9},
-  {18.5, 11.5, 9},
-  {18.5, 12.5, 9},
+    // a tight ring of pillars (9) framing the central altar
+    {10.0, 10.0, 9}, {11.5, 10.0, 9}, {12.5, 10.0, 9}, {14.0, 10.0, 9},
+    {10.0, 14.0, 9}, {11.5, 14.0, 9}, {12.5, 14.0, 9}, {14.0, 14.0, 9},
+    {10.0, 11.5, 9}, {10.0, 12.5, 9}, {14.0, 11.5, 9}, {14.0, 12.5, 9},
 
-  //some barrels around the map
-  {21.5, 1.5, 8},
-  {15.5, 1.5, 8},
-  {16.0, 1.8, 8},
-  {16.2, 1.2, 8},
-  {3.5,  2.5, 8},
-  {9.5, 15.5, 8},
-  {10.0, 15.1,8},
-  {10.5, 15.8,8},
+    // clusters of barrels (8) stashed near the chunky wall blocks
+    {4.5, 4.5, 8}, {4.8, 4.2, 8}, {4.2, 4.8, 8},
+    {19.5, 19.5, 8}, {19.8, 19.2, 8}, {19.2, 19.8, 8}
 };
-
-
 double Zbuffer[SCREEN_WIDTH];
 int sprite_order[SPRITE_COUNT];
 
@@ -193,7 +213,7 @@ int main(int argc, char* args[]){
 			if (event.key.keysym.scancode == SDL_SCANCODE_C){
 				if (event.key.keysym.mod & KMOD_ALT){
 					is_floorcasting = !is_floorcasting;
-					cout << "change cast" << endl;
+					// cout << "change cast" << endl;
 				}
 			}
 		}
@@ -290,11 +310,13 @@ int main(int argc, char* args[]){
 				Uint32 color;
 
 				color = texture[floor_texture][TEXTURE_WIDTH * ty + tx];
-				color = (color >> 1) & 8355711;
+				// color = (color >> 1) & 8355711;
+				color = apply_fog_depth(color, row_distance);
 				buffer[y][x] = color;
 
 				color = texture[ceiling_texture][TEXTURE_WIDTH * ty + tx];
-				color = (color >> 1) & 8355711;
+				// color = (color >> 1) & 8355711;
+				color = apply_fog_depth(color, row_distance);
 				buffer[SCREEN_HEIGHT - y - 1][x] = color;
 			}
 		}	
@@ -395,7 +417,9 @@ int main(int argc, char* args[]){
 				texture_pos += step;
 				Uint32 color = texture[texture_num][TEXTURE_HEIGHT * textureY + textureX];
 
-				if (side == 1) color = (color >> 1) & 8355711;
+				// if (side == 1) color = (color >> 1) & 8355711;
+
+				color = apply_fog_depth(color, perpWallDist, side == 1);
 				buffer[y][x] = color;
 			}
 			
@@ -446,6 +470,7 @@ int main(int argc, char* args[]){
 						int d = (y) * 256 - SCREEN_HEIGHT * 128 + sprite_height * 128;
 						int textureY = ((d * TEXTURE_HEIGHT) / sprite_height) / 256;
 						Uint32 color = texture[sprite[sprite_order[i]].texture][TEXTURE_WIDTH * textureY + textureX];
+						if ((color & 0x00FFFFFF) != 0) color = apply_fog_depth(color, transformY);
 						if ((color & 0x00FFFFFF) != 0) buffer[y][stripe] = color;
 					}
 				}
