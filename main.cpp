@@ -125,6 +125,46 @@ Sprite sprite[SPRITE_COUNT] = {
     {4.5, 4.5, 8}, {4.8, 4.2, 8}, {4.2, 4.8, 8},
     {19.5, 19.5, 8}, {19.8, 19.2, 8}, {19.2, 19.8, 8}
 };
+
+#define LIGHT_COUNT 12
+Sprite light_sprites[LIGHT_COUNT] = {
+	{2.5, 2.5, 10}, {2.5, 21.5, 10}, {21.5, 2.5, 10}, {21.5, 21.5, 10},
+	{11.5, 2.5, 10}, {11.5, 21.5, 10}, {2.5, 11.5, 10}, {21.5, 11.5, 10},
+	{7.5, 7.5, 10}, {16.5, 16.5, 10}, {7.5, 16.5, 10}, {16.5, 7.5, 10}
+};
+
+Uint32 apply_point_lights(Uint32 color, double worldX, double worldY, Sprite lights[], int light_count, double ambient = 0.38){
+	double total_r = ambient, total_g = ambient, total_b = ambient;
+
+	for (int i = 0; i < light_count; i++){
+		double dx = worldX - lights[i].x;
+		double dy = worldY - lights[i].y;
+		double dist_sq = dx * dx + dy * dy;
+
+		// skip lights further than ~8 units away
+		if (dist_sq > 64.0) continue;
+		if (dist_sq < 0.001) dist_sq = 0.001;
+
+		double dist = sqrt(dist_sq);
+		double attenuation = 1.0 / (1.0 + 0.2 * dist + 0.06 * dist_sq);
+
+		// warm golden/amber light
+		total_r += 1.6 * attenuation;
+		total_g += 1.1 * attenuation;
+		total_b += 0.35 * attenuation;
+	}
+
+	// allow overexposure near light sources for brilliant hotspots
+	total_r = min(1.8, total_r);
+	total_g = min(1.8, total_g);
+	total_b = min(1.8, total_b);
+
+	Uint8 r = (Uint8)min(255.0, ((color >> 16) & 0xFF) * total_r);
+	Uint8 g = (Uint8)min(255.0, ((color >> 8) & 0xFF) * total_g);
+	Uint8 b = (Uint8)min(255.0, (color & 0xFF) * total_b);
+
+	return (0xFF << 24) | (r << 16) | (g << 8) | b;
+}
 double Zbuffer[SCREEN_WIDTH];
 int sprite_order[SPRITE_COUNT];
 
@@ -310,11 +350,13 @@ int main(int argc, char* args[]){
 				Uint32 color;
 
 				color = texture[floor_texture][TEXTURE_WIDTH * ty + tx];
+
 				// color = (color >> 1) & 8355711;
 				color = apply_fog_depth(color, row_distance);
 				buffer[y][x] = color;
 
 				color = texture[ceiling_texture][TEXTURE_WIDTH * ty + tx];
+
 				// color = (color >> 1) & 8355711;
 				color = apply_fog_depth(color, row_distance);
 				buffer[SCREEN_HEIGHT - y - 1][x] = color;
@@ -411,14 +453,18 @@ int main(int argc, char* args[]){
 				buffer[y][x] = 0xFF333333;
 			}
 			}
-
+			
+			double hit_worldX = posX + perpWallDist * raydirX;
+			double hit_worldY = posY + perpWallDist * raydirY;
+			
 			for (int y = draw_start; y < draw_end; y++){
 				int textureY = (int)texture_pos & (TEXTURE_HEIGHT - 1);
 				texture_pos += step;
 				Uint32 color = texture[texture_num][TEXTURE_HEIGHT * textureY + textureX];
 
 				// if (side == 1) color = (color >> 1) & 8355711;
-
+				
+				color = apply_point_lights(color, hit_worldX, hit_worldY, light_sprites, LIGHT_COUNT);
 				color = apply_fog_depth(color, perpWallDist, side == 1);
 				buffer[y][x] = color;
 			}
@@ -479,6 +525,56 @@ int main(int argc, char* args[]){
 			
 		}
 		
+
+		// volumetric light shafts, kinda weird rn will make better later
+		for (int li = 0; li < LIGHT_COUNT; li++){
+			double lx = light_sprites[li].x - posX;
+			double ly = light_sprites[li].y - posY;
+
+			double inv_det = 1.0 / (planeX * dirY - planeY * dirX);
+			double tX = inv_det * (dirY * lx - dirX * ly);
+			double tY = inv_det * (planeX * ly - planeY * lx);
+
+			if (tY < 0.5 || tY > 10.0) continue; // behind camera or too far
+
+			int scrX = (int)((SCREEN_WIDTH / 2) * (1 + tX / tY));
+			if (scrX < -80 || scrX >= SCREEN_WIDTH + 80) continue;
+
+			int sprite_h = abs((int)(SCREEN_HEIGHT / tY));
+			// shaft starts near the top of the light sprite, extends to bottom of screen
+			int shaft_top = SCREEN_HEIGHT / 2 - sprite_h / 2;
+			int shaft_bottom = SCREEN_HEIGHT;
+
+			// narrow point at the light, widens toward the floor
+			int max_half_w = sprite_h / 3;
+			double dist_fade = 1.0 / (1.0 + tY * 0.25);
+
+			for (int y = max(0, shaft_top); y < shaft_bottom; y++){
+				double t = (double)(y - shaft_top) / max(1, shaft_bottom - shaft_top);
+				int half_w = max(1, (int)(max_half_w * t));
+				double vert_intensity = (1.0 - t * 0.5) * dist_fade * 0.12;
+
+				int x_start = max(0, scrX - half_w);
+				int x_end = min(SCREEN_WIDTH - 1, scrX + half_w);
+				for (int x = x_start; x <= x_end; x++){
+					if (Zbuffer[x] < tY) continue; // wall in front occludes shaft
+
+					double edge = (double)abs(x - scrX) / (half_w + 1);
+					double px_i = vert_intensity * (1.0 - edge * edge);
+
+					// bright edge lines along the cone boundary for definition
+					int dist_from_edge = abs(abs(x - scrX) - half_w);
+					if (dist_from_edge <= 1)
+						px_i = max(px_i, vert_intensity * 1.3);
+
+					Uint32 c = buffer[y][x];
+					int r = min(255, (int)(((c >> 16) & 0xFF) + 255 * px_i));
+					int g = min(255, (int)(((c >> 8) & 0xFF) + 210 * px_i));
+					int b = min(255, (int)((c & 0xFF) + 65 * px_i));
+					buffer[y][x] = (0xFF << 24) | (r << 16) | (g << 8) | b;
+				}
+			}
+		}
 
 		SDL_UpdateTexture(screen_texture, NULL, buffer, SCREEN_WIDTH * sizeof(Uint32));
 		SDL_RenderClear(renderer);
