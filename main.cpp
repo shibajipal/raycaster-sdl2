@@ -574,6 +574,46 @@ int main(int argc, char* args[]){
 					buffer[y][x] = (0xFF << 24) | (r << 16) | (g << 8) | b;
 				}
 			}
+		int map_scale = 4;
+		int map_pad = 10;  // padding from screen edge
+		// semi-transparent background
+		for (int my = 0; my < MAP_HEIGHT; my++){
+			for (int mx = 0; mx < MAP_WIDTH; mx++){
+				Uint32 map_col = (world_map[mx][my] > 0) ? 0xFFAAAAAA : 0xFF1A1A2E;
+				for (int py = 0; py < map_scale; py++){
+					for (int px = 0; px < map_scale; px++){
+						int sx = map_pad + mx * map_scale + px;
+						int sy = map_pad + my * map_scale + py;
+						if (sx < SCREEN_WIDTH && sy < SCREEN_HEIGHT){
+							// 70% map, 30% existing scene for transparency feel
+							Uint32 bg = buffer[sy][sx];
+							Uint8 mr = (Uint8)(((map_col >> 16) & 0xFF) * 0.7 + ((bg >> 16) & 0xFF) * 0.3);
+							Uint8 mg = (Uint8)(((map_col >> 8) & 0xFF) * 0.7 + ((bg >> 8) & 0xFF) * 0.3);
+							Uint8 mb = (Uint8)((map_col & 0xFF) * 0.7 + (bg & 0xFF) * 0.3);
+							buffer[sy][sx] = (0xFF << 24) | (mr << 16) | (mg << 8) | mb;
+						}
+					}
+				}
+			}
+		}
+		// player dot (red, 3x3)
+		int pmx = map_pad + (int)(posX * map_scale);
+		int pmy = map_pad + (int)(posY * map_scale);
+		for (int py = -1; py <= 1; py++){
+			for (int px = -1; px <= 1; px++){
+				int sx = pmx + px, sy = pmy + py;
+				if (sx >= 0 && sx < SCREEN_WIDTH && sy >= 0 && sy < SCREEN_HEIGHT)
+					buffer[sy][sx] = 0xFFFF3333;
+			}
+		}
+		// direction line (white, 6 pixels long)
+		for (int i = 0; i < 6; i++){
+			int sx = pmx + (int)(dirX * i);
+			int sy = pmy + (int)(dirY * i);
+			if (sx >= 0 && sx < SCREEN_WIDTH && sy >= 0 && sy < SCREEN_HEIGHT)
+				buffer[sy][sx] = 0xFFFFFFFF;
+		}
+
 		}
 
 		SDL_UpdateTexture(screen_texture, NULL, buffer, SCREEN_WIDTH * sizeof(Uint32));
