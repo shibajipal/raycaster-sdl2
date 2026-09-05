@@ -210,7 +210,9 @@ int main(int argc, char* args[]){
 	}
 	
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 	bool is_running = true;
+	bool is_fullscreen = false;
 	bool is_floorcasting = true;
 	SDL_Event event;
 	
@@ -250,10 +252,13 @@ int main(int argc, char* args[]){
 				is_running = false;
 			}
 			else if (event.type == SDL_KEYDOWN && event.key.repeat == 0){
+			if (event.key.keysym.scancode == SDL_SCANCODE_F11){
+				is_fullscreen = !is_fullscreen;
+				SDL_SetWindowFullscreen(window, is_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+			}
 			if (event.key.keysym.scancode == SDL_SCANCODE_C){
 				if (event.key.keysym.mod & KMOD_ALT){
 					is_floorcasting = !is_floorcasting;
-					// cout << "change cast" << endl;
 				}
 			}
 		}
@@ -276,7 +281,7 @@ int main(int argc, char* args[]){
 			if (state[SDL_SCANCODE_LSHIFT]){
 			// cout << "strafe left" << endl;
 			if (world_map[int(posX - dirY * move_speed)][int(posY)] == 0) posX -= dirY * move_speed;
-			if (world_map[int(posX)][int(posY + dirY * move_speed)] == 0) posY += dirX * move_speed;
+			if (world_map[int(posX)][int(posY + dirX * move_speed)] == 0) posY += dirX * move_speed;
 			}
 			
 			else{
@@ -294,7 +299,7 @@ int main(int argc, char* args[]){
 			if ((state[SDL_SCANCODE_LSHIFT])){
 				// cout << "strafe right" << endl;
 				if (world_map[int(posX + dirY * move_speed)][int(posY)] == 0) posX += dirY * move_speed;
-				if (world_map[int(posX)][int(posY - dirY * move_speed)] == 0) posY -= dirX * move_speed;
+				if (world_map[int(posX)][int(posY - dirX * move_speed)] == 0) posY -= dirX * move_speed;
 		}
 			else{
 		// cout << "normal right" << endl;
